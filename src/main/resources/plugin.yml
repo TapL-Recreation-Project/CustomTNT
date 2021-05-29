@@ -1,0 +1,9 @@
+name: CustomTNT
+version: ${project.version}
+main: me.swipez.customtnt.CustomTNT
+api-version: 1.16
+authors: [ notnotnotswipez ]
+commands:
+  explosiontest:
+    usage: /explosiontest <radius>
+    description: Creates a radial explosion
