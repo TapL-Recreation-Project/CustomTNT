@@ -57,72 +57,6 @@ public class ExplosionManager {
         return ret;
     }
 
-    public static List<Block> generateExplosionBlocksSlowest(Location center, int radius, Random random, Particle particle){
-        List<Block> explosionBlocks = new ArrayList<>();
-        int beginner = radius;
-        for(int X = -radius; X < radius; X++) {
-            for(int Y = -radius; Y < radius; Y++) {
-                for(int Z = -radius; Z < radius; Z++) {
-                    if(Math.sqrt((X * X) + (Y * Y) + (Z * Z)) <= radius) {
-                        //Bukkit.broadcastMessage(beginner+"");
-                        Block block = center.getWorld().getBlockAt(X + center.getBlockX(), Y + center.getBlockY(), Z + center.getBlockZ());
-                        if (generateRequiredChecks(10, random)){
-                            center.getWorld().spawnParticle(particle, block.getLocation(), 1);
-                        }
-                        center.getWorld().playSound(block.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
-                        if (!block.getType().isAir()){
-                            explosionBlocks.add(block);
-                            if (random.nextBoolean()){
-                                radius = beginner-random.nextInt(2);
-                            }
-                        }
-                        //else {
-                        //radius = beginner;
-                        //}
-                    }
-                }
-            }
-        }
-
-        return explosionBlocks;
-    }
-
-    private static void generateExplosionEffect(Location center, int radius, Random random, int loops){
-        for (int i = 0; i < loops; i++){
-            int randomX = random.nextInt(radius);
-            int randomY = random.nextInt(radius);
-            int randomZ = random.nextInt(radius);
-            if (random.nextBoolean()){
-                center.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, center.add(randomX, randomY, randomZ), 5);
-            }
-            else {
-                center.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, center.subtract(randomX, randomY, randomZ), 5);
-            }
-        }
-    }
-
-    public static List<Block> generateExplosionBlocks(Location center, int radius, Random random, Particle particle){
-        List<Block> explosionBlocks = new ArrayList<>();
-        int beginner = radius;
-        for(int X = -radius; X < radius; X++) {
-            for(int Y = -radius; Y < radius; Y++) {
-                for(int Z = -radius; Z < radius; Z++) {
-                    if(Math.sqrt((X * X) + (Y * Y) + (Z * Z)) <= radius) {
-                        Block block = center.getWorld().getBlockAt(X + center.getBlockX(), Y + center.getBlockY(), Z + center.getBlockZ());
-                        center.getWorld().playSound(block.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
-                        if (!block.getType().isAir()){
-                            explosionBlocks.add(block);
-                            if (random.nextBoolean()){
-                                radius = beginner-random.nextInt(2);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return explosionBlocks;
-    }
 
     public static void animateExplosionOptimized(int radius, Location center, Random random, Player player) {
         final List<Block> sphereBlocks = getBlocksInSphere(center, radius);
@@ -182,43 +116,5 @@ public class ExplosionManager {
                 }
             }.runTaskLater(CustomTNT.plugin, i * TICKS_BETWEEN_STEPS);
         }
-    }
-
-    public static void animateExplosion(int radius, Location center, Random random, Particle particle, int dropCheckCount){
-        int starting = radius;
-        int loops = 0;
-        while (starting > 2){
-            starting -= 2;
-            loops++;
-        }
-        for (int i = 0; i < loops; i++){
-            int amount = i+1;
-            BukkitTask task = new BukkitRunnable() {
-                @Override
-                public void run() {
-
-                    List<Block> explosionBlocks = generateExplosionBlocksSlowest(center, amount*2, random, particle);;
-                    for (Block block : explosionBlocks){
-                        if (generateRequiredChecks(dropCheckCount, random)){
-                            block.breakNaturally(new ItemStack(Material.DIAMOND_PICKAXE));
-                        }
-                        else {
-                            block.setType(Material.AIR);
-                        }
-                        block.setType(Material.AIR);
-                    }
-                }
-            }.runTaskLater(CustomTNT.plugin, i * 10L);
-        }
-    }
-
-    public static boolean generateRequiredChecks(int checks, Random random){
-        int correct = 0;
-        for (int i = 0; i < checks; i++){
-            if (random.nextBoolean()){
-                correct++;
-            }
-        }
-        return correct == checks;
     }
 }
